@@ -1,0 +1,9 @@
+extend type Query {
+    aunts: [Aunt!]! @paginate(defaultCount: 10)
+    aunt(id:ID @eq) : Aunt @find(model:"App\\aunt")
+    auntsign(type:String,datetimes:Date) : String @middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\AuntGraphql@sign")
+}
+type Aunt{
+    type:String !
+    datetimes:Date
+}

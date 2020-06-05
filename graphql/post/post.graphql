@@ -1,0 +1,42 @@
+extend type Query {
+    posts: [Post!]! @paginate(defaultCount: 10)
+    post(id:ID @eq) : Post @find(model:"App\\Post")
+    lookpost: [Post] @field(resolver:"App\\graphql\\PostGraphql@index")
+    write(title:String,content:String,image_url:Int) : String@middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\PostGraphql@write")
+    delect(post_id:Int) : String @middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\PostGraphql@delect")
+    forward(post_id:Int) : String @middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\PostGraphql@forward")
+    like(post_id:Int,status:Int) : String  @middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\PostGraphql@like")
+    reply(post_id:Int,reply:String) : String  @middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\PostGraphql@reply")
+    details(post_id:Int) :Post @field(resolver:"App\\graphql\\PostGraphql@details")
+    replyToUser(post_id:Int,reply_id:String,reply:String):String @middleware(checks:["jwt"]) @field(resolver:"App\\graphql\\PostGraphql@replyToUser")
+}
+
+type Post {
+    id: ID!
+    title:String
+    content:String
+    user_id:Int
+    like_num:Int
+    reply_num:Int
+    post_id:Int
+    status:String
+    images:[Images] @morphMany
+    postable:Postable!
+    forward: Post @hasOne
+    reply:[reply!] @hasMany
+}
+type Images {
+    image_url:Int
+    imageable:Imageable !
+}
+type reply {
+    id:ID
+    user:User @belongsTo
+    reply_id:Int
+    reply:String
+    replyable:replyable @morphTo
+    replyables:replyables @morphTo
+    post:Post @belongsTo
+}
+union Imageable= Post
+
